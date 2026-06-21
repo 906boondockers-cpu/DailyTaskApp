@@ -38,10 +38,13 @@ jobs:
 
       - name: Build APK with Buildozer
         run: |
-          # The yes command auto-accepts Android SDK licenses during the build
+          # Completely purge old build environments to force a clean spec read
+          rm -rf .buildozer/
+          rm -rf ~/.buildozer/
+          
+          # Run compilation natively
           yes | buildozer -v android debug
         env:
-          # Targets newer python-for-android requirements smoothly
           APP_ANDROID_ARCHS: armeabi-v7a,arm64-v8a
 
       - name: Upload APK Artifact
