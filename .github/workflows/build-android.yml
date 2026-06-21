@@ -43,6 +43,10 @@ jobs:
           rm -rf ~/.buildozer/
           rm -rf ~/.local/share/pythonforandroid/
           echo "Starting verbose build compilation loop..."
+          
+          # This tells buildozer to automatically accept all SDK/NDK licenses
+          export BUILDOZER_ACCEPT_LICENSE=1
+          
           buildozer --verbose android debug > build_output.log 2>&1 || BUILD_FAILED=true
           if [ "$BUILD_FAILED" = true ]; then
             echo "=================================================="
@@ -55,9 +59,3 @@ jobs:
           fi
         env:
           APP_ANDROID_ARCHS: armeabi-v7a,arm64-v8a
-
-      - name: Upload APK Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: DailyTaskApp-APK
-          path: bin/*.apk
