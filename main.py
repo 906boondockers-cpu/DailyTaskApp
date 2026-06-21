@@ -1,3 +1,7 @@
+import sys
+# Create a crash-log text file on your phone if the app fails to boot
+sys.stderr = open('curtsy_crash_log.txt', 'w')
+
 from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
@@ -5,7 +9,7 @@ from kivy.uix.textinput import TextInput
 from kivy.uix.label import Label
 from kivy.clock import Clock
 from kivy.utils import platform
-from datetime import datetime  # Added to read system time
+from datetime import datetime
 import random
 import json
 import os
@@ -24,19 +28,25 @@ class Curtsy(App):
             "Try a new healthy recipe.",
         ]
         self.daily_time = "08:00"
-        self.notification_sent_today = False  # Track to prevent spamming within the same minute
+        self.notification_sent_today = False  
         self.last_checked_day = datetime.now().date()
         
-        self.load_data()
+        try:
+            self.load_data()
+        except Exception as e:
+            print(f"Data loading error caught: {e}")
 
         if platform == 'android':
-            self.request_android_permissions()
+            try:
+                self.request_android_permissions()
+            except Exception as e:
+                print(f"Permissions hook failed: {e}")
 
-        # Start the background timer loop to check the clock every 30 seconds
+        # Standard heartbeat timer
         Clock.schedule_interval(self.check_time_loop, 30)
 
         layout = BoxLayout(orientation='vertical', padding=20, spacing=10)
-        layout.add_widget(Label(text='🌟 Daily New Task App', font_size=28, bold=True))
+        layout.add_widget(Label(text='🌟 Curtsy', font_size=28, bold=True))
 
         layout.add_widget(Label(text='Notification Time (HH:MM):', font_size=16))
         self.time_input = TextInput(text=self.daily_time, multiline=False, font_size=18)
@@ -57,23 +67,19 @@ class Curtsy(App):
         return layout
 
     def check_time_loop(self, dt):
-        """Runs silently every 30 seconds to check if it's time to fire a task notification"""
         now = datetime.now()
         current_time_str = now.strftime("%H:%M")
         current_day = now.date()
 
-        # Reset the daily anti-spam lock when the calendar date rolls over
         if current_day != self.last_checked_day:
             self.notification_sent_today = False
             self.last_checked_day = current_day
 
-        # Trigger if the clock matches the target time and we haven't sent one yet today
         if current_time_str == self.daily_time and not self.notification_sent_today:
-            self.notification_sent_today = True  # Lock it out for this minute
+            self.notification_sent_today = True  
             self.fire_scheduled_notification()
 
     def fire_scheduled_notification(self):
-        """Selects a random item and pushes it to the system tray"""
         if self.tasks:
             task = random.choice(self.tasks)
             try:
@@ -106,17 +112,15 @@ class Curtsy(App):
         tasks_str = self.task_input.text.strip()
         self.tasks = [t.strip() for t in tasks_str.split('\n') if t.strip()]
         
-        # Keep formatting uniform (clean up user whitespace padding)
         raw_time = self.time_input.text.strip()
         if len(raw_time) == 4 and ":" in raw_time:
-            raw_time = "0" + raw_time # Auto fix H:MM to HH:MM
+            raw_time = "0" + raw_time 
         self.daily_time = raw_time
 
         data = {"tasks": self.tasks, "time": self.daily_time}
         with open('daily_tasks.json', 'w') as f:
             json.dump(data, f)
         
-        # Reset tracker when time is updated so user can test immediate new times
         self.notification_sent_today = False
         print(f"✅ Saved! Tasks: {len(self.tasks)} | Time: {self.daily_time}")
 
@@ -133,4 +137,9 @@ class Curtsy(App):
                 print(f"Notification display failed: {e}")
 
 if __name__ == '__main__':
-    curtsy().run()
+    try:
+        Curtsy().run()
+    except Exception as e:
+        import traceback
+        with open('curtsy_boot_crash.txt', 'w') as f:
+            traceback.print_exc(file=f)
