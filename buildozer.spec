@@ -6,10 +6,10 @@
 [app]
 
 # (str) Title of your application
-title = Daily New Task App
+title = Curtsy
 
 # (str) Package name
-package.name = dailytaskapp
+package.name = Curtsy
 
 # (str) Package domain (needed for android/ios packaging)
 package.domain = org.rob
@@ -52,7 +52,7 @@ requirements = python3,kivy==2.3.0,kivymd,plyer,pillow
 #presplash.filename = %(source.dir)s/data/presplash.png
 
 # (str) Icon of the application
-#icon.filename = "C:\Users\Rob\Desktop\DailyTaskApp\icon.png"
+#icon.filename = ""C:\Users\Rob\Desktop\DailyTaskApp\New files to upload\icon.png""
 
 # (list) Supported orientations
 # Valid options are: landscape, portrait, portrait-reverse, landscape-reverse, or all
@@ -110,16 +110,16 @@ android.permissions = POST_NOTIFICATIONS, SCHEDULE_EXACT_ALARM, WAKE_LOCK
 #android.features = android.hardware.usb.host
 
 # (int) Target Android API, should be as high as possible.
-android.api = 33
+#android.api = 34
 
 # (int) Minimum API your APK / AAB will support.
-android.minapi = 24
+#android.minapi = 24
 
 # (int) Android SDK version to use
 #android.sdk = 20
 
 # (str) Android NDK version to use
-android.ndk = 25b
+#android.ndk = 23b
 
 # (int) Android NDK API to use. This is the minimum API your app will support, it should usually match android.minapi.
 #android.ndk_api = 21
