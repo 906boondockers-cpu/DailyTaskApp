@@ -18,6 +18,14 @@ jobs:
         with:
           python-version: '3.10'
 
+      # Explicitly forces the system runner to utilize Java 17 for modern Android compilers
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+       Pentameter: Install System Dependencies
       - name: Install System Dependencies
         run: |
           sudo apt-get update
@@ -27,7 +35,6 @@ jobs:
             git \
             libffi-dev \
             libssl-dev \
-            openjdk-17-jdk \
             unzip \
             zip \
             zlib1g-dev
@@ -39,19 +46,18 @@ jobs:
 
       - name: Build APK with Buildozer
         run: |
-          # Use GitHub's pre-installed SDK paths to bypass the missing sdkmanager issue
           export ANDROID_HOME="/usr/local/lib/android/sdk"
           export ANDROID_SDK_ROOT="/usr/local/lib/android/sdk"
           
-          # Automatically accept all licenses in the pre-installed SDK path
+          # Force java home paths to point cleanly to the newly configured JDK 17 setup
+          export JAVA_HOME=$JAVA_HOME_17_X64
+          
           yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
           
           echo "Starting build compilation loop..."
           export BUILDOZER_ACCEPT_LICENSE=1
           
-          # Run buildozer debug build natively
           yes | buildozer --verbose android debug > build_output.log 2>&1 || BUILD_FAILED=true
-          
           if [ "$BUILD_FAILED" = true ]; then
             echo "=================================================="
             echo "❌ BUILD FAILED! SHOWING FINAL 400 LINES OF LOG:"
