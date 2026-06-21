@@ -11,14 +11,16 @@ fullscreen = 0
 # Core Requirements
 requirements = python3,kivy,plyer,pillow
 
+# Link Your Staged Icon Image Explicitly
+icon.filename = %(source.dir)s/icon.png
+
 # Active Android Permissions
 android.permissions = POST_NOTIFICATIONS, SCHEDULE_EXACT_ALARM, WAKE_LOCK
 
-# Modern Android Target Settings (DO NOT ADD DUPLICATES)
+# Modern Android Target Settings & 16 KB Emulator Alignment
 android.api = 33
 android.minapi = 24
 android.ndk = 25b
-# (list) Extra ndk/compiler flags to enforce modern 16 KB ELF alignment 
 android.ndk_api = 24
 android.extra_lflags = -Wl,-z,max-page-size=16384 -Wl,-z,common-page-size=16384
 
