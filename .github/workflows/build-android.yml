@@ -37,19 +37,21 @@ jobs:
           pip install --upgrade pip
           pip install Cython==0.29.33 buildozer
 
-      - name: Build APK with Buildozer
+       - name: Build APK with Buildozer
         run: |
           rm -rf .buildozer/
           rm -rf ~/.buildozer/
           rm -rf ~/.local/share/pythonforandroid/
-          echo "Starting build compilation loop..."
-          yes | buildozer -v android debug > build_output.log 2>&1 || BUILD_FAILED=true
+          echo "Starting verbose build compilation loop..."
+          
+          # Adding the explicit --verbose flag tells buildozer to output EVERYTHING natively
+          buildozer --verbose android debug > build_output.log 2>&1 || BUILD_FAILED=true
+          
           if [ "$BUILD_FAILED" = true ]; then
             echo "=================================================="
-            echo "❌ BUILD FAILED! SCANNING LOG FOR CORE ERRORS:"
+            echo "❌ BUILD FAILED! SHOWING FINAL 400 LINES OF LOG:"
             echo "=================================================="
-            # Searches the log for explicit errors and prints the 30 lines surrounding them
-            grep -B 5 -A 25 -i "error\|exception\|failed" build_output.log || tail -n 300 build_output.log
+            tail -n 400 build_output.log
             exit 1
           else
             echo "✅ Build completed successfully!"
