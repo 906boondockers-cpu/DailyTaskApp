@@ -38,11 +38,14 @@ jobs:
 
       - name: Build APK with Buildozer
         run: |
-          # Completely purge old build environments to force a clean spec read
+          # Clean local repository caches
           rm -rf .buildozer/
           rm -rf ~/.buildozer/
           
-          # Run compilation natively
+          # Force purge the deep python-for-android recipe cache state
+          rm -rf ~/.local/share/pythonforandroid/
+          
+          # Run compilation cleanly
           yes | buildozer -v android debug
         env:
           APP_ANDROID_ARCHS: armeabi-v7a,arm64-v8a
