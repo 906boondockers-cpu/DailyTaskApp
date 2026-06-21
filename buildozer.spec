@@ -4,7 +4,7 @@ package.name = curtsy
 package.domain = org.rob
 source.dir = .
 source.include_exts = py,png,jpg,kv,atlas,json
-version = 1.0.0
+version = 1.0.1
 orientation = portrait
 fullscreen = 0
 
