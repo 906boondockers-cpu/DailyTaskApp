@@ -9,7 +9,7 @@
 title = Curtsy
 
 # (str) Package name
-package.name = Curtsy
+package.name = curtsy
 
 # (str) Package domain (needed for android/ios packaging)
 package.domain = org.rob
