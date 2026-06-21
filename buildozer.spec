@@ -15,8 +15,8 @@ requirements = python3,kivy,plyer,pillow,pyjnius
 # Custom Image Icon Link
 icon.filename = %(source.dir)s/icon.png
 
-# Active Android Permissions
-android.permissions = POST_NOTIFICATIONS, SCHEDULE_EXACT_ALARM, WAKE_LOCK
+# (list) Permissions (Wipe out SCHEDULE_EXACT_ALARM)
+android.permissions = POST_NOTIFICATIONS, WAKE_LOCK
 
 # Modern Android 14 Core Targets & 16 KB Alignment Flags
 android.api = 34
