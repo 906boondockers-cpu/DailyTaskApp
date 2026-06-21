@@ -18,12 +18,22 @@ jobs:
         with:
           python-version: '3.11'
 
-      # Explicitly forces Java 17 compatibility for modern toolchains
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
+
+      - name: Cache Buildozer Dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.buildozer
+            .buildozer
+            ~/.local/share/pythonforandroid
+          key: ${{ runner.os }}-buildozer-${{ hashFiles('buildozer.spec') }}
+          restore-keys: |
+            ${{ runner.os }}-buildozer-
 
       - name: Install System Dependencies
         run: |
@@ -38,36 +48,32 @@ jobs:
             zip \
             zlib1g-dev
 
-      # Upgrades the core packaging engine to master tracking branches natively
+      # Installs the master branch of buildozer natively
       - name: Install Modern Buildozer and Cython
         run: |
           pip install --upgrade pip
           pip install Cython==3.0.11 git+https://github.com
 
+       Pentameter: Build APK with Buildozer
       - name: Build APK with Buildozer
         run: |
-          # 1. Fully purge historical corrupted compiler states
-          rm -rf .buildozer/
-          rm -rf ~/.buildozer/
-          rm -rf ~/.local/share/pythonforandroid/
-          
-          # 2. Map system environment execution scopes
+          # Point cleanly to system runner SDK tools
           export ANDROID_HOME="/usr/local/lib/android/sdk"
           export ANDROID_SDK_ROOT="/usr/local/lib/android/sdk"
           export JAVA_HOME=$JAVA_HOME_17_X64
           
-          # 3. Auto-accept standard system platform licenses
+          # Auto-accept standard system platform licenses
           yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
           
-          echo "Launching 16KB native aligned production build..."
+          echo "Launching fast 16KB native aligned production build..."
           export BUILDOZER_ACCEPT_LICENSE=1
           
-          # 4. Overwrite spec definitions to enforce stable matching versions
+          # Overwrite spec definitions to enforce stable matching versions
           export APP_ANDROID_API=34
           export APP_ANDROID_MINAPI=24
           export APP_ANDROID_NDK_VERSION=26b
           
-          # 5. Compile with explicit alignment and memory flags
+          # Compile with explicit alignment and memory flags
           yes | buildozer --verbose android debug > build_output.log 2>&1 || BUILD_FAILED=true
           if [ "$BUILD_FAILED" = true ]; then
             echo "=================================================="
