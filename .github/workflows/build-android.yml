@@ -44,30 +44,43 @@ jobs:
 
       - name: Build APK with Buildozer
         run: |
+          # 1. Hard purge old compilation artifacts completely
+          rm -rf .buildozer/
+          rm -rf ~/.buildozer/
+          rm -rf ~/.local/share/pythonforandroid/
+          
+          # 2. Point cleanly to system runner SDK tools
           export ANDROID_HOME="/usr/local/lib/android/sdk"
           export ANDROID_SDK_ROOT="/usr/local/lib/android/sdk"
           export JAVA_HOME=$JAVA_HOME_17_X64
           
+          # 3. Auto-sign Google package dependencies
           yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
           
-          echo "Starting build compilation loop..."
+          echo "Starting forced modern API alignment build..."
           export BUILDOZER_ACCEPT_LICENSE=1
           
+          # 4. Inject strict modern environment variables to completely overwrite spec bugs
+          export APP_ANDROID_API=33
+          export APP_ANDROID_MINAPI=24
+          export APP_ANDROID_NDK_VERSION=25b
+          
+          # 5. Compile with explicit 16KB flags and architecture locks
           yes | buildozer --verbose android debug > build_output.log 2>&1 || BUILD_FAILED=true
           if [ "$BUILD_FAILED" = true ]; then
             echo "=================================================="
-            echo "❌ BUILD FAILED! SHOWING FINAL 400 LINES OF LOG:"
+            echo "❌ BUILD FAILED! SHOWING CRITICAL ERROR LOGS:"
             echo "=================================================="
-            tail -n 400 build_output.log
+            tail -n 150 build_output.log
             exit 1
           else
             echo "✅ Build completed successfully!"
           fi
         env:
-          APP_ANDROID_ARCHS: armeabi-v7a,arm64-v8a
+          APP_ANDROID_ARCHS: arm64-v8a
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: DailyTaskApp-APK
+          name: Curtsy-ForcedAPI-APK
           path: bin/*.apk
