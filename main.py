@@ -11,7 +11,7 @@ import json
 import os
 from plyer import notification
 
-class DailyTaskApp(App):
+class Curtsy(App):
     def build(self):
         self.tasks = [
             "Go for a 30-minute walk outdoors.",
