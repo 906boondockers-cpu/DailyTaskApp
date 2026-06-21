@@ -46,18 +46,13 @@ jobs:
           yes | buildozer -v android debug > build_output.log 2>&1 || BUILD_FAILED=true
           if [ "$BUILD_FAILED" = true ]; then
             echo "=================================================="
-            echo "❌ BUILD FAILED! PRINTING THE CRITICAL ERROR LOGS:"
+            echo "❌ BUILD FAILED! SCANNING LOG FOR CORE ERRORS:"
             echo "=================================================="
-            tail -n 150 build_output.log
+            # Searches the log for explicit errors and prints the 30 lines surrounding them
+            grep -B 5 -A 25 -i "error\|exception\|failed" build_output.log || tail -n 300 build_output.log
             exit 1
           else
             echo "✅ Build completed successfully!"
           fi
         env:
           APP_ANDROID_ARCHS: armeabi-v7a,arm64-v8a
-
-      - name: Upload APK Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: DailyTaskApp-APK
-          path: bin/*.apk
