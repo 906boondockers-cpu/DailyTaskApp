@@ -48,32 +48,26 @@ jobs:
             zip \
             zlib1g-dev
 
-      # Installs the master branch of buildozer natively
       - name: Install Modern Buildozer and Cython
         run: |
           pip install --upgrade pip
           pip install Cython==3.0.11 git+https://github.com
 
-       Pentameter: Build APK with Buildozer
       - name: Build APK with Buildozer
         run: |
-          # Point cleanly to system runner SDK tools
           export ANDROID_HOME="/usr/local/lib/android/sdk"
           export ANDROID_SDK_ROOT="/usr/local/lib/android/sdk"
           export JAVA_HOME=$JAVA_HOME_17_X64
           
-          # Auto-accept standard system platform licenses
           yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
           
           echo "Launching fast 16KB native aligned production build..."
           export BUILDOZER_ACCEPT_LICENSE=1
           
-          # Overwrite spec definitions to enforce stable matching versions
           export APP_ANDROID_API=34
           export APP_ANDROID_MINAPI=24
           export APP_ANDROID_NDK_VERSION=26b
           
-          # Compile with explicit alignment and memory flags
           yes | buildozer --verbose android debug > build_output.log 2>&1 || BUILD_FAILED=true
           if [ "$BUILD_FAILED" = true ]; then
             echo "=================================================="
