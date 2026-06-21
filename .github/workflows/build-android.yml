@@ -44,10 +44,32 @@ jobs:
           rm -rf ~/.local/share/pythonforandroid/
           echo "Starting verbose build compilation loop..."
           
-          # This tells buildozer to automatically accept all SDK/NDK licenses
-          export BUILDOZER_ACCEPT_LICENSE=1
+          # Define the target paths for both layout locations
+          PATH_A="$HOME/.buildozer/android/platform/android-sdk/licenses"
+          PATH_B="$GITHUB_WORKSPACE/.buildozer/android/platform/android-sdk/licenses"
           
-          buildozer --verbose android debug > build_output.log 2>&1 || BUILD_FAILED=true
+          # Initialize directory trees cleanly
+          mkdir -p "$PATH_A"
+          mkdir -p "$PATH_B"
+          
+          # The official Google Android SDK License agreement hashes
+          HASHES=$(cat << 'EOF'
+          24333f1a69b12ffb283d85347b9f3d970085d547
+          282d64f74d077b4159497d10902c41f609e25c04
+          791207223403454d468e3f98299056c65f6b9f4e
+          84831b9409646a918e30573bab4c9c91346d8abd
+          504667f4c0de7af1a06de9578cfde3933036c547
+          8933bad161af4178b1185d1a37fbf41ea5269c55
+          EOF
+          )
+          
+          # Write verification seeds natively into both configuration scopes
+          echo "$HASHES" > "$PATH_A/android-sdk-license"
+          echo "$HASHES" > "$PATH_B/android-sdk-license"
+          
+          export BUILDOZER_ACCEPT_LICENSE=1
+          yes | buildozer --verbose android debug > build_output.log 2>&1 || BUILD_FAILED=true
+          
           if [ "$BUILD_FAILED" = true ]; then
             echo "=================================================="
             echo "❌ BUILD FAILED! SHOWING FINAL 400 LINES OF LOG:"
