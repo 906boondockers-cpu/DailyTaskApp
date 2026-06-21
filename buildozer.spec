@@ -4,12 +4,13 @@ package.name = curtsy
 package.domain = org.rob
 source.dir = .
 source.include_exts = py,png,jpg,kv,atlas,json
-version = 2.0.0
+version = 2.0.1
 orientation = portrait
 fullscreen = 0
 
-# Core Requirements
-requirements = python3,kivy,plyer,pillow
+# (list) Application requirements
+# comma separated e.g. requirements = sqlite3,kivy
+requirements = python3,kivy,plyer,pillow,pyjnius
 
 # Custom Image Icon Link
 icon.filename = %(source.dir)s/icon.png
