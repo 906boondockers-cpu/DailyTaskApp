@@ -3,22 +3,48 @@ name: Build Android APK
 on:
   push:
     branches: [ main, master ]
+  workflow_dispatch:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Buildozer
-        uses: ArtemSBulgakov/buildozer-action@v1
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
-          command: android debug
-          buildozer_version: master
-          requirements: python3,kivy==2.3.1,kivymd,plyer
+          python-version: '3.10'
 
-      - name: Upload APK
+      - name: Install System Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            ccache \
+            git \
+            libffi-dev \
+            libssl-dev \
+            openjdk-17-jdk \
+            unzip \
+            zip \
+            zlib1g-dev
+
+      - name: Install Buildozer and Cython
+        run: |
+          pip install --upgrade pip
+          pip install Cython==0.29.33 buildozer
+
+      - name: Build APK with Buildozer
+        run: |
+          # The yes command auto-accepts Android SDK licenses during the build
+          yes | buildozer -v android debug
+        env:
+          # Targets newer python-for-android requirements smoothly
+          APP_ANDROID_ARCHS: armeabi-v7a,arm64-v8a
+
+      - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: DailyTaskApp-APK
