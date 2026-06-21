@@ -133,4 +133,4 @@ class Curtsy(App):
                 print(f"Notification display failed: {e}")
 
 if __name__ == '__main__':
-    DailyTaskApp().run()
+    curtsy().run()
